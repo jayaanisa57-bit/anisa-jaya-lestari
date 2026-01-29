@@ -1,0 +1,355 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Rapor Peserta Didik - {{ siswa.nama_siswa }}</title>
+    <style>
+        /* Reset dan variabel */
+        :root {
+            --primary-color: #2c3e50;
+            --border-color: #333;
+            --header-bg: #f0f0f0;
+            --light-bg: #f9f9f9;
+            --text-color: #000;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: "Times New Roman", "Georgia", serif;
+            color: var(--text-color);
+            line-height: 1.5;
+            padding: 30px;
+            max-width: 1000px;
+            margin: 0 auto;
+            background-color: #fff;
+        }
+        
+        /* Header konten non-print */
+        .print-controls {
+            text-align: center;
+            margin-bottom: 30px;
+            padding-bottom: 20px;
+            border-bottom: 2px dashed #ccc;
+        }
+        
+        .btn {
+            padding: 10px 25px;
+            background-color: var(--primary-color);
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 16px;
+            margin: 0 10px;
+            text-decoration: none;
+            display: inline-block;
+            transition: background-color 0.3s;
+        }
+        
+        .btn:hover {
+            background-color: #1a252f;
+        }
+        
+        .btn-secondary {
+            background-color: #7f8c8d;
+        }
+        
+        .btn-secondary:hover {
+            background-color: #6c7b7d;
+        }
+        
+        /* Header dokumen */
+        .header-dokumen {
+            text-align: center;
+            margin-bottom: 40px;
+            padding-bottom: 20px;
+            border-bottom: 3px double var(--border-color);
+        }
+        
+        .header-dokumen h1 {
+            font-size: 26px;
+            font-weight: bold;
+            margin-bottom: 10px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+        
+        .header-dokumen h2 {
+            font-size: 20px;
+            font-weight: normal;
+            margin-bottom: 5px;
+            color: #444;
+        }
+        
+        .header-dokumen .tahun-ajaran {
+            font-size: 18px;
+            font-weight: bold;
+            margin-top: 15px;
+        }
+        
+        /* Informasi siswa */
+        .info-siswa {
+            margin-bottom: 40px;
+            background-color: var(--light-bg);
+            padding: 20px;
+            border: 1px solid var(--border-color);
+        }
+        
+        .info-item {
+            display: flex;
+            margin-bottom: 8px;
+        }
+        
+        .info-label {
+            font-weight: bold;
+            min-width: 120px;
+        }
+        
+        .info-value {
+            flex-grow: 1;
+        }
+        
+        /* Tabel nilai */
+        .nilai-container {
+            margin-bottom: 50px;
+        }
+        
+        .nilai-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 15px;
+            table-layout: fixed;
+        }
+        
+        .nilai-table th {
+            background-color: var(--header-bg);
+            font-weight: bold;
+            padding: 12px 8px;
+            border: 1px solid var(--border-color);
+            text-align: center;
+            vertical-align: middle;
+        }
+        
+        .nilai-table td {
+            padding: 10px 8px;
+            border: 1px solid var(--border-color);
+            text-align: center;
+            vertical-align: middle;
+        }
+        
+        .nilai-table td:nth-child(2) {
+            text-align: left;
+            padding-left: 15px;
+        }
+        
+        .nilai-table td:nth-child(7) {
+            text-align: left;
+            padding-left: 15px;
+        }
+        
+        .nilai-akhir {
+            font-weight: bold;
+            font-size: 16px;
+        }
+        
+        /* Bagian tanda tangan */
+        .ttd-section {
+            margin-top: 80px;
+            display: flex;
+            justify-content: space-between;
+        }
+        
+        .ttd-box {
+            text-align: center;
+            width: 250px;
+        }
+        
+        .ttd-label {
+            margin-bottom: 60px;
+            font-weight: bold;
+        }
+        
+        .ttd-line {
+            border-top: 1px solid var(--border-color);
+            padding-top: 10px;
+            margin-top: 60px;
+        }
+        
+        /* Footer */
+        .footer-note {
+            margin-top: 40px;
+            font-size: 13px;
+            text-align: center;
+            color: #666;
+            font-style: italic;
+        }
+        
+        /* Print styles */
+        @media print {
+            body {
+                padding: 20px;
+                font-size: 12pt;
+            }
+            
+            .print-controls {
+                display: none;
+            }
+            
+            .header-dokumen h1 {
+                font-size: 22pt;
+            }
+            
+            .header-dokumen h2 {
+                font-size: 16pt;
+            }
+            
+            .info-siswa {
+                border: 1pt solid var(--border-color);
+                padding: 15pt;
+            }
+            
+            .nilai-table {
+                font-size: 11pt;
+            }
+            
+            .nilai-table th,
+            .nilai-table td {
+                padding: 8pt 6pt;
+                border: 1pt solid var(--border-color);
+            }
+            
+            .ttd-section {
+                margin-top: 100pt;
+            }
+            
+            .ttd-line {
+                border-top: 1pt solid var(--border-color);
+            }
+            
+            /* Mencegah pemecahan halaman di dalam baris tabel */
+            .nilai-table tr {
+                page-break-inside: avoid;
+            }
+        }
+        
+        /* Responsif untuk layar kecil */
+        @media screen and (max-width: 768px) {
+            body {
+                padding: 15px;
+            }
+            
+            .print-controls {
+                display: flex;
+                flex-direction: column;
+                gap: 10px;
+                align-items: center;
+            }
+            
+            .btn {
+                width: 100%;
+                max-width: 300px;
+                margin: 5px 0;
+            }
+            
+            .ttd-section {
+                flex-direction: column;
+                gap: 40px;
+                align-items: center;
+            }
+            
+            .nilai-table {
+                display: block;
+                overflow-x: auto;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="print-controls">
+        <div>
+            <button onclick="window.print()" class="btn">🖨️ Cetak Rapor</button>
+            <a href="{{ url_for('index') }}" class="btn btn-secondary">← Kembali ke Daftar Nilai</a>
+        </div>
+        <p style="margin-top: 10px; color: #666; font-style: italic;"></p>
+    </div>
+
+    <div class="header-dokumen">
+        <h1>Rapor Peserta Didik</h1>
+        <h2>Sekolah Menengah Kejuruan (SMK)</h2>
+        <div class="tahun-ajaran">TAHUN AJARAN {{ siswa.tahun_ajaran or '2023/2024' }}</div>
+    </div>
+
+    <div class="info-siswa">
+        <div class="info-item">
+            <div class="info-label">NIS</div>
+            <div class="info-value">: {{ siswa.nis }}</div>
+        </div>
+        <div class="info-item">
+            <div class="info-label">Nama Lengkap</div>
+            <div class="info-value">: {{ siswa.nama_siswa }}</div>
+        </div>
+        <div class="info-item">
+            <div class="info-label">Kelas</div>
+            <div class="info-value">: {{ siswa.nama_kelas }}</div>
+        </div>
+        <div class="info-item">
+            <div class="info-label">Semester</div>
+            <div class="info-value">: {{ siswa.semester or 'Ganjil' }}</div>
+        </div>
+    </div>
+
+    <div class="nilai-container">
+        <table class="nilai-table">
+            <thead>
+                <tr>
+                    <th width="5%">No</th>
+                    <th width="25%">Mata Pelajaran</th>
+                    <th width="10%">Tugas</th>
+                    <th width="10%">UTS</th>
+                    <th width="10%">UAS</th>
+                    <th width="15%">Nilai Akhir</th>
+                    <th width="25%">Deskripsi</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for n in nilai %}
+                <tr>
+                    <td>{{ loop.index }}</td>
+                    <td>{{ n.nama_mapel }}</td>
+                    <td>{{ n.nilai_tugas }}</td>
+                    <td>{{ n.nilai_uts }}</td>
+                    <td>{{ n.nilai_uas }}</td>
+                    <td class="nilai-akhir">{{ n.nilai_akhir }}</td>
+                    <td>{{ n.deskripsi }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    <div class="ttd-section">
+        <div class="ttd-box">
+            <div class="ttd-label">Orang Tua/Wali</div>
+            <div class="ttd-line"></div>
+            <p>( ______________________ )</p>
+        </div>
+        
+        <div class="ttd-box">
+            <div class="ttd-label">Wali Kelas</div>
+            <div class="ttd-line"></div>
+            <p>( ______________________ )</p>
+        </div>
+        
+        <div class="ttd-box">
+            <div class="ttd-label">Kepala Sekolah</div>
+            <div class="ttd-line"></div>
+            <p>( ______________________ )</p>
+        </div>
+    </div>
+</body>
+</html>

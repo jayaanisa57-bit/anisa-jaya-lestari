@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <title>Update Nilai Siswa</title>
+<style>
+    /* style.css */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+body {
+    background-color: #f5f7fa;
+    color: #333;
+    line-height: 1.6;
+    padding: 20px;
+    max-width: 900px;
+    margin: 0 auto;
+}
+
+h3 {
+    color: #2c3e50;
+    margin-bottom: 25px;
+    padding-bottom: 10px;
+    border-bottom: 2px solid #3498db;
+    font-size: 1.8rem;
+}
+
+form {
+    background-color: white;
+    padding: 25px;
+    border-radius: 8px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+    margin-bottom: 30px;
+}
+
+label {
+    display: block;
+    font-weight: 600;
+    color: #2c3e50;
+    margin-bottom: 8px;
+    font-size: 0.95rem;
+}
+
+select, input[type="number"], input[type="text"] {
+    width: 100%;
+    padding: 10px 12px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    font-size: 1rem;
+    transition: border 0.3s;
+    margin-bottom: 5px;
+}
+
+select:focus, input[type="number"]:focus, input[type="text"]:focus {
+    outline: none;
+    border-color: #3498db;
+    box-shadow: 0 0 0 2px rgba(52, 152, 219, 0.2);
+}
+
+button[type="submit"] {
+    background-color: #2ecc71;
+    color: white;
+    border: none;
+    padding: 12px 24px;
+    border-radius: 4px;
+    font-size: 1rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background-color 0.3s;
+    margin-right: 15px;
+}
+
+button[type="submit"]:hover {
+    background-color: #27ae60;
+}
+
+a {
+    display: inline-block;
+    background-color: #95a5a6;
+    color: white;
+    text-decoration: none;
+    padding: 12px 24px;
+    border-radius: 4px;
+    font-size: 1rem;
+    font-weight: 600;
+    transition: background-color 0.3s;
+}
+
+a:hover {
+    background-color: #7f8c8d;
+}
+
+br {
+    margin-bottom: 5px;
+}
+
+select option {
+    padding: 5px;
+}
+</style>
+
+</head>
+<body>
+
+<h3>Tambah Nilai</h3>
+
+<form method="post">
+    <label>Siswa</label><br>
+    <select name="nis" required>
+        {% for s in siswa %}
+        <option value="{{ s.nis }}">{{ s.nis }} - {{ s.nama_siswa }}</option>
+        {% endfor %}
+    </select><br><br>
+
+    <label>Mata Pelajaran</label><br>
+    <select name="id_mapel" required>
+        {% for m in mapel %}
+        <option value="{{ m.id_mapel }}">{{ m.nama_mapel }}</option>
+        {% endfor %}
+    </select><br><br>
+
+    <label>Nilai Tugas</label><br>
+    <input type="number" name="nilai_tugas" required><br><br>
+
+    <label>Nilai UTS</label><br>
+    <input type="number" name="nilai_uts" required><br><br>
+
+    <label>Nilai UAS</label><br>
+    <input type="number" name="nilai_uas" required><br><br>
+
+    <label>Semester</label><br>
+    <input type="text" name="semester" required><br><br>
+
+    <label>Tahun Ajaran</label><br>
+    <input type="text" name="tahun_ajaran" required placeholder="2024/2025"><br><br>
+
+    <label>Deskripsi</label><br>
+    <input type="text" name="deskripsi" required><br><br>
+
+
+    <button type="submit">Simpan</button>
+    <a href="{{ url_for('index') }}">Batal</a>
+</form>
+
+
+</body>
+</html>

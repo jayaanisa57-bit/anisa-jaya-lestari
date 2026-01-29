@@ -1,0 +1,684 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Daftar Nilai Siswa</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+  <style>
+    /* Reset dan variabel */
+    :root {
+      --primary-color: #2c3e50;
+      --primary-dark: #1a252f;
+      --light-gray: #f4f6f8;
+      --border-color: #ddd;
+      --text-color: #333;
+      --white: #fff;
+      --danger-color: #e74c3c;
+      --warning-color: #f39c12;
+      --success-color: #2ecc71;
+      --info-color: #3498db;
+    }
+    
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+    }
+    
+    body {
+      background-color: var(--light-gray);
+      color: var(--text-color);
+      line-height: 1.6;
+      padding: 20px;
+    }
+    
+    /* Container utama */
+    .container {
+      background: var(--white);
+      max-width: 1200px;
+      margin: 0 auto;
+      border-radius: 8px;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+      padding: 30px;
+      border: 1px solid var(--border-color);
+    }
+    
+    /* Header */
+    .header {
+      text-align: center;
+      margin-bottom: 30px;
+      padding-bottom: 20px;
+      border-bottom: 2px solid var(--primary-color);
+    }
+    
+    .header h1 {
+      color: var(--primary-color);
+      font-size: 28px;
+      margin-bottom: 10px;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+    }
+    
+    /* Search Bar - Simple Version */
+    .search-container {
+      display: flex;
+      gap: 10px;
+      margin-bottom: 25px;
+      align-items: center;
+    }
+    
+    .search-box {
+      flex: 1;
+      position: relative;
+    }
+    
+    .search-input {
+      width: 100%;
+      padding: 12px 20px 12px 45px;
+      border: 1px solid var(--border-color);
+      border-radius: 6px;
+      font-size: 16px;
+      transition: all 0.3s;
+      background-color: var(--white);
+    }
+    
+    .search-input:focus {
+      outline: none;
+      border-color: var(--info-color);
+      box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.2);
+    }
+    
+    .search-icon {
+      position: absolute;
+      left: 15px;
+      top: 50%;
+      transform: translateY(-50%);
+      color: #7f8c8d;
+      font-size: 18px;
+    }
+    
+    .search-btn {
+      padding: 12px 25px;
+      background-color: var(--info-color);
+      color: white;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+      font-size: 16px;
+      font-weight: 500;
+      transition: background-color 0.3s;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      white-space: nowrap;
+    }
+    
+    .search-btn:hover {
+      background-color: #2980b9;
+    }
+    
+    .clear-btn {
+      padding: 12px 20px;
+      background-color: #95a5a6;
+      color: white;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+      font-size: 16px;
+      font-weight: 500;
+      transition: background-color 0.3s;
+      text-decoration: none;
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+    }
+    
+    .clear-btn:hover {
+      background-color: #7f8c8d;
+    }
+    
+    /* Search Info */
+    .search-info {
+      background-color: #e8f4fc;
+      padding: 15px 20px;
+      border-radius: 6px;
+      margin-bottom: 25px;
+      border-left: 4px solid var(--info-color);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 10px;
+    }
+    
+    .search-info p {
+      font-size: 16px;
+      color: #2c3e50;
+      margin: 0;
+    }
+    
+    .search-term {
+      color: var(--info-color);
+      font-weight: bold;
+      background-color: rgba(52, 152, 219, 0.1);
+      padding: 2px 8px;
+      border-radius: 4px;
+      margin: 0 5px;
+    }
+    
+    .result-count {
+      color: var(--primary-color);
+      font-weight: bold;
+    }
+    
+    /* Tombol Tambah */
+    .add-btn-container {
+      margin-bottom: 25px;
+    }
+    
+    .add-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      padding: 12px 25px;
+      background-color: var(--success-color);
+      color: white;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+      font-size: 16px;
+      font-weight: 500;
+      text-decoration: none;
+      transition: background-color 0.3s;
+    }
+    
+    .add-btn:hover {
+      background-color: #27ae60;
+    }
+    
+    /* Tabel */
+    .table-container {
+      overflow-x: auto;
+      margin-top: 20px;
+    }
+    
+    .data-table {
+      width: 100%;
+      border-collapse: collapse;
+      min-width: 1000px;
+    }
+    
+    .data-table thead {
+      background-color: var(--primary-color);
+      color: var(--white);
+    }
+    
+    .data-table th {
+      padding: 14px 12px;
+      text-align: left;
+      font-weight: 600;
+      border-bottom: 3px solid var(--primary-dark);
+    }
+    
+    .data-table tbody tr {
+      border-bottom: 1px solid var(--border-color);
+      transition: background-color 0.2s;
+    }
+    
+    .data-table tbody tr:hover {
+      background-color: rgba(44, 62, 80, 0.05);
+    }
+    
+    .data-table td {
+      padding: 12px;
+      vertical-align: middle;
+    }
+    
+    /* Highlight nama yang dicari */
+    .highlight-name {
+      background-color: #fffacd;
+      font-weight: 600;
+      padding: 2px 4px;
+      border-radius: 3px;
+      color: #2c3e50;
+    }
+    
+    /* Kolom khusus */
+    .data-table td:nth-child(3) {
+      font-weight: 500;
+    }
+    
+    .data-table td:nth-child(9) {
+      font-weight: bold;
+      color: var(--primary-color);
+    }
+    
+    /* Aksi */
+    .actions {
+      display: flex;
+      gap: 10px;
+    }
+    
+    .action-link {
+      color: var(--primary-color);
+      text-decoration: none;
+      font-size: 14px;
+      padding: 6px 12px;
+      border-radius: 4px;
+      background-color: #f8f9fa;
+      border: 1px solid #eee;
+      transition: all 0.2s;
+    }
+    
+    .action-link:hover {
+      background-color: #e9ecef;
+      text-decoration: none;
+    }
+    
+    .action-link.edit:hover {
+      background-color: #e3f2fd;
+      border-color: #bbdefb;
+    }
+    
+    .action-link.delete {
+      color: var(--danger-color);
+      border-color: #ffebee;
+    }
+    
+    .action-link.delete:hover {
+      background-color: #ffebee;
+      border-color: #ffcdd2;
+    }
+    
+    .action-link.print {
+      color: var(--warning-color);
+      border-color: #fff3e0;
+    }
+    
+    .action-link.print:hover {
+      background-color: #fff3e0;
+      border-color: #ffe0b2;
+    }
+    
+    /* No results */
+    .no-results {
+      text-align: center;
+      padding: 50px 20px;
+      color: #7f8c8d;
+      font-size: 16px;
+    }
+    
+    .no-results-icon {
+      font-size: 64px;
+      margin-bottom: 20px;
+      opacity: 0.3;
+    }
+    
+    .no-results p {
+      margin-bottom: 10px;
+    }
+    
+    .no-results a {
+      color: var(--info-color);
+      text-decoration: none;
+      font-weight: 500;
+    }
+    
+    .no-results a:hover {
+      text-decoration: underline;
+    }
+    
+    /* Responsif */
+    @media (max-width: 768px) {
+      body {
+        padding: 10px;
+      }
+      
+      .container {
+        padding: 20px;
+      }
+      
+      .header h1 {
+        font-size: 24px;
+      }
+      
+      .search-container {
+        flex-direction: column;
+        align-items: stretch;
+      }
+      
+      .search-btn, .clear-btn {
+        width: 100%;
+        justify-content: center;
+      }
+      
+      .actions {
+        flex-direction: column;
+        gap: 5px;
+      }
+      
+      .action-link {
+        text-align: center;
+      }
+    }
+    
+    @media print {
+      .search-container, 
+      .search-info, 
+      .add-btn-container,
+      .actions {
+        display: none !important;
+      }
+      
+      body {
+        padding: 0;
+        background: none;
+      }
+      
+      .container {
+        box-shadow: none;
+        border: none;
+        padding: 10px;
+      }
+      
+      .data-table tbody tr {
+        break-inside: avoid;
+      }
+    }
+    .add-btn-container {
+  display: flex;
+  justify-content: center;  
+  align-items: center;
+  gap: 15px;
+  margin-bottom: 25px;
+  flex-wrap: wrap;           
+}
+
+.action-btn {
+  min-width: 220px;         
+  padding: 12px 0;
+  text-align: center;
+  background-color: var(--success-color);
+  color: white;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 16px;
+  font-weight: 500;
+  text-decoration: none;
+  transition: background-color 0.3s, transform 0.2s;
+}
+
+.action-btn:hover {
+  background-color: #27ae60;
+  transform: translateY(-2px);
+}
+
+/* warna khusus tombol cetak */
+.action-btn:nth-child(2) {
+  background-color: var(--warning-color);
+}
+
+.action-btn:nth-child(2):hover {
+  background-color: #e67e22;
+}
+/* Container utama */
+.filter-container {
+  background: #ffffff;
+  padding: 16px 20px;
+  border-radius: 10px;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.08);
+  margin-bottom: 20px;
+}
+
+/* Form layout */
+.filter-form {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 16px;
+  align-items: flex-end;
+}
+
+/* Group label + select */
+.filter-group {
+  display: flex;
+  flex-direction: column;
+  min-width: 180px;
+}
+
+.filter-group label {
+  font-size: 14px;
+  font-weight: 600;
+  margin-bottom: 6px;
+  color: #333;
+}
+
+.filter-group select {
+  padding: 8px 10px;
+  border-radius: 6px;
+  border: 1px solid #ccc;
+  font-size: 14px;
+  transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+.filter-group select:focus {
+  outline: none;
+  border-color: #4f46e5;
+  box-shadow: 0 0 0 2px rgba(79, 70, 229, 0.2);
+}
+
+/* Tombol */
+.filter-buttons {
+  display: flex;
+  gap: 10px;
+}
+
+.filter-buttons button,
+.filter-buttons .btn {
+  padding: 8px 16px;
+  border-radius: 6px;
+  font-size: 14px;
+  cursor: pointer;
+  border: none;
+  text-decoration: none;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Tombol Filter */
+.filter-buttons button {
+  background-color: #4f46e5;
+  color: #fff;
+  transition: background-color 0.2s;
+}
+
+.filter-buttons button:hover {
+  background-color: #4338ca;
+}
+
+/* Tombol Reset */
+.filter-buttons .btn-secondary {
+  background-color: #e5e7eb;
+  color: #374151;
+  transition: background-color 0.2s;
+}
+
+.filter-buttons .btn-secondary:hover {
+  background-color: #d1d5db;
+}
+
+/* Responsive */
+@media (max-width: 600px) {
+  .filter-form {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .filter-buttons {
+    justify-content: flex-end;
+  }
+}
+
+
+  </style>
+</head>
+
+<body>
+  <div class="container">
+    <div class="header">
+      <h1>Daftar Nilai Siswa</h1>
+      <p>SMKN 2 Cimahi</p>
+    </div>
+
+   <div class="pertama1">
+    <h2>Daftar Nilai</h2>
+
+    <!-- Filter Form -->
+    <div class="filter-container">
+      <form method="GET" action="{{ url_for('daftar_nilai') }}" class="filter-form">
+        <div class="filter-group">
+          <label for="kelas">Kelas:</label>
+          <select name="kelas" id="kelas">
+            <option value="">Semua Kelas</option>
+            {% for kelas in kelas_list %}
+            <option value="{{ kelas.nama_kelas }}" {% if filter_kelas == kelas.nama_kelas %}selected{% endif %}>
+              {{ kelas.nama_kelas }}
+            </option>
+            {% endfor %}
+          </select>
+        </div>
+
+        <div class="filter-group">
+          <label for="semester">Semester:</label>
+          <select name="semester" id="semester">
+            <option value="">Semua Semester</option>
+            {% for semester in semester_list %}
+            <option value="{{ semester.semester }}" {% if filter_semester == semester.semester|string %}selected{% endif %}>
+              {{ semester.semester }}
+            </option>
+            {% endfor %}
+          </select>
+        </div>
+
+        <div class="filter-buttons">
+          <button type="submit">Filter</button>
+          <a href="{{ url_for('daftar_nilai') }}" class="btn btn-secondary">Reset</a>
+        </div>
+      </form>
+    </div>
+
+   <div class="add-btn-container">
+    <a href="{{ url_for('tambah_nilai') }}" class="action-btn">
+      ➕ Tambah Nilai Baru
+    </a>
+    <button onclick="window.print()" class="action-btn">
+      🖨️ Cetak Rapor
+    </button>
+  </div>
+
+
+    <div class="table-container">
+      {% if siswa %}
+      <table class="data-table">
+        <thead>
+          <tr>
+            <th>ID Nilai</th>
+            <th>NIS</th>
+            <th>Nama Siswa</th>
+            <th>Kelas</th>
+            <th>Mata Pelajaran</th>
+            <th>Tugas</th>
+            <th>UTS</th>
+            <th>UAS</th>
+            <th>Nilai Akhir</th>
+            <th>Alamat</th>
+            <th>Deskripsi</th>
+            <th>Aksi</th>
+          </tr>
+        </thead>
+        
+        <tbody>
+          {% for s in siswa %}
+          <tr>
+            <td>{{ s.id_nilai }}</td>
+            <td>{{ s.nis }}</td>
+            <td>
+              {% if request.args.get('cari_nama') %}
+                {% set nama = s.nama_siswa %}
+                {% set keyword = request.args.get('cari_nama')|lower %}
+                {% set nama_lower = nama|lower %}
+                
+                {% if keyword in nama_lower %}
+                  {% set start_index = nama_lower.find(keyword) %}
+                  {% set end_index = start_index + keyword|length %}
+                  
+                  {{ nama[:start_index] }}
+                  <span class="highlight-name">{{ nama[start_index:end_index] }}</span>
+                  {{ nama[end_index:] }}
+                {% else %}
+                  {{ nama }}
+                {% endif %}
+              {% else %}
+                {{ s.nama_siswa }}
+              {% endif %}
+            </td>
+            <td>{{ s.nama_kelas }}</td>
+            <td>{{ s.nama_mapel }}</td>
+            <td>{{ s.nilai_tugas }}</td>
+            <td>{{ s.nilai_uts }}</td>
+            <td>{{ s.nilai_uas }}</td>
+            <td>{{ s.nilai_akhir }}</td>
+            <td>{{ s.alamat }}</td>
+            <td>{{ s.deskripsi }}</td>
+            <td>
+              <div class="actions">
+                <a href="{{ url_for('edit_nilai', id_nilai=s.id_nilai) }}" class="action-link edit">Edit</a>
+                <a href="{{ url_for('delete_nilai', id_nilai=s.id_nilai) }}" 
+                   onclick="return confirm('Yakin ingin menghapus data?')" 
+                   class="action-link delete">Hapus</a>
+                <a href="{{ url_for('cetak_rapor', nis=s.nis) }}" 
+                      target="_blank" 
+                      class="action-link print">Cetak</a>
+
+              </div>
+            </td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+      {% else %}
+      <div class="no-results">
+        <div class="no-results-icon">
+          {% if request.args.get('cari_nama') %}🔍{% else %}📋{% endif %}
+        </div>
+        <p>
+          {% if request.args.get('cari_nama') %}
+          Tidak ditemukan siswa dengan nama "<strong>{{ request.args.get('cari_nama') }}</strong>"
+          {% else %}
+          Belum ada data nilai siswa
+          {% endif %}
+        </p>
+        {% if request.args.get('cari_nama') %}
+        <p><a href="{{ url_for('index') }}">Tampilkan semua data</a></p>
+        {% endif %}
+      </div>
+      {% endif %}
+    </div>
+  </div>
+
+  <script>
+    document.addEventListener('DOMContentLoaded', function() {
+      const searchInput = document.querySelector('input[name="cari_nama"]');
+      const urlParams = new URLSearchParams(window.location.search);
+      
+      if (urlParams.has('cari_nama')) {
+        searchInput.focus();
+        searchInput.select();
+      }
+    });
+  </script>
+</body>
+</html>
